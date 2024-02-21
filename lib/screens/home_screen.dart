@@ -1,7 +1,40 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DateTime firstDay = DateTime.now();
+
+  void onHeartPressed() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            color: Colors.white,
+            height: 300,
+            child: CupertinoDatePicker(
+              initialDateTime: firstDay,
+              onDateTimeChanged: (DateTime date) {
+                setState(() {
+                  firstDay = date;
+                });
+              },
+              mode: CupertinoDatePickerMode.date,
+            ),
+          ),
+        );
+      },
+      barrierDismissible: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +47,10 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _DdayBox(),
+            _DdayBox(
+              onHeartPressed: onHeartPressed,
+              firstDay: firstDay,
+            ),
             _CoupleImageBox(),
           ],
         ),
@@ -24,40 +60,56 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _DdayBox extends StatelessWidget {
-  const _DdayBox({super.key});
+  final DateTime firstDay;
+  final GestureTapCallback onHeartPressed;
+
+  const _DdayBox(
+      {super.key, required this.firstDay, required this.onHeartPressed});
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final now = DateTime.now();
+
     return Column(
       children: [
-        SizedBox(height: 16,),
+        SizedBox(
+          height: 16,
+        ),
         Text(
           'U&I',
           style: textTheme.displayLarge,
         ),
-        SizedBox(height: 16,),
+        SizedBox(
+          height: 16,
+        ),
         Text(
           '우리 처음 만난 날',
           style: textTheme.bodyLarge,
         ),
-        SizedBox(height: 16,),
+        SizedBox(
+          height: 16,
+        ),
         Text(
-          '2024.2.20',
+          '${firstDay.year}.${firstDay.month}.${firstDay.day}',
           style: textTheme.bodyMedium,
         ),
-        SizedBox(height: 16,),
+        SizedBox(
+          height: 16,
+        ),
         IconButton(
           iconSize: 60.0,
-          onPressed: () {},
+          onPressed: onHeartPressed,
           icon: Icon(
             Icons.favorite,
             color: Colors.red,
           ),
         ),
-        SizedBox(height: 16,),
+        SizedBox(
+          height: 16,
+        ),
         Text(
-          'D+365',
+          'D+${DateTime(now.year, now.month, now.day).difference(firstDay).inDays + 1}',
           style: textTheme.displayMedium,
         ),
       ],
