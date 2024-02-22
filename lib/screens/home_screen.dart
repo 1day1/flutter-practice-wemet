@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,9 +11,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DateTime firstDay = DateTime.now();
+  late SharedPreferences prefs;
 
-  void onHeartPressed() {
-    showCupertinoDialog(
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPrefs();
+  }
+
+  Future initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final String? _firstDay = prefs.getString('firstDay');
+    if (_firstDay != null) {
+      setState(() {
+        firstDay = DateTime.parse(_firstDay);
+      });
+    }
+  }
+
+  void onHeartPressed() async {
+    await showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
         return Align(
@@ -22,7 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 300,
             child: CupertinoDatePicker(
               initialDateTime: firstDay,
-              onDateTimeChanged: (DateTime date) {
+              maximumDate: DateTime.now(),
+              onDateTimeChanged: (DateTime date)  {
                 setState(() {
                   firstDay = date;
                 });
@@ -34,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       barrierDismissible: true,
     );
+    await prefs.setString('firstDay', firstDay.toString());
   }
 
   @override
